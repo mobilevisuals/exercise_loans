@@ -4,24 +4,27 @@
  * and open the template in the editor.
  */
 
+import javax.enterprise.context.RequestScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
 
 /**
- *
  * @author Admin
  */
 @Named(value = "loanCalculator")
-@SessionScoped
+@RequestScoped
 public class LoanCalculator implements Serializable {
 
     /**
      * Creates a new instance of LoanCalculator
      */
     public LoanCalculator() {
+
     }
 
+    private double monthlyPayment;
     private double loanAmount;
     private double annualInterestRate;
     private int numberOfYears;
@@ -50,20 +53,14 @@ public class LoanCalculator implements Serializable {
         this.numberOfYears = numberOfYears;
     }
 
-    public void clear() {
-        annualInterestRate = 0;
-        numberOfYears = 0;
-        loanAmount = 0;
-    }
-
-    public double getMonthlyPayment() {
-        double monthlyInterestRate = annualInterestRate / 1200;
-        return  loanAmount * monthlyInterestRate / (1
-                - 1 / Math.pow(1 + monthlyInterestRate, numberOfYears * 12));
+    private double getMonthlyPayment() {
+        Loan loan = new Loan(annualInterestRate, numberOfYears, loanAmount);
+        monthlyPayment = loan.getMonthlyPayment();
+        return monthlyPayment;
     }
 
     public double getTotalPayment() {
-        return getMonthlyPayment() * numberOfYears * 12;
+        return monthlyPayment * numberOfYears * 12;
     }
 
     public String getResult() {
